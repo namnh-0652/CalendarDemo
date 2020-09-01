@@ -30,6 +30,9 @@ class PrefetchingWeekViewLoader(
         val events = ArrayList<WeekViewEvent>()
         if (loadedEvents != null)
             events.addAll(loadedEvents)
+        if (this.prefetchingPeriod == 1) {
+            return events
+        }
         // fetch periods before/after
         for (i in 1..this.prefetchingPeriod) {
             loadedEvents = weekViewLoader.onLoad(periodIndex - i)

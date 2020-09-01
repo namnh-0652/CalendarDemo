@@ -163,7 +163,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     /**
      *  corner radius for event rect (in px)
      */
-    var eventCornerRadius = 0.0f
+    var eventCornerRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, resources.displayMetrics)
     /**
      *  whether the week view should fling horizontally.
      */
@@ -722,7 +722,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         }
 
     @ColorInt
-    var todayColumnBackgroundColor: Int = Color.rgb(239, 247, 254)
+    var todayColumnBackgroundColor: Int = Color.rgb(255, 255, 255)
         set(value) {
             if (field == value)
                 return
@@ -812,7 +812,8 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     /**
      *  the gap between overlapping events.
      */
-    var overlappingEventGap: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, resources.displayMetrics)
+    var overlappingEventGap: Float =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, resources.displayMetrics)
         set(value) {
             if (field == value)
                 return
@@ -893,7 +894,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
      *  whether "now" line should be displayed. "Now" line is defined by the attributes
      * `nowLineColor` and `nowLineThickness`.
      */
-    var isShowNowLine: Boolean = false
+    var isShowNowLine: Boolean = true
         set(value) {
             if (field == value)
                 return
@@ -1052,7 +1053,8 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             newEventColor = a.getColor(R.styleable.WeekView_newEventColor, newEventColor)
             newEventIconDrawable = a.getDrawable(R.styleable.WeekView_newEventIconResource)
             // For backward compatibility : Set "mNewEventIdentifier" if the attribute is "WeekView_newEventId" of type int
-            newEventIdentifier = a.getString(R.styleable.WeekView_newEventIdentifier) ?: newEventIdentifier
+            newEventIdentifier = a.getString(R.styleable.WeekView_newEventIdentifier)
+                ?: newEventIdentifier
             newEventLengthInMinutes = a.getInt(R.styleable.WeekView_newEventLengthInMinutes, newEventLengthInMinutes)
             newEventTimeResolutionInMinutes = a.getInt(R.styleable.WeekView_newEventTimeResolutionInMinutes, newEventTimeResolutionInMinutes)
             eventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, eventPadding)
@@ -1081,7 +1083,8 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             headerWeekDayTitleTextSize = a.getDimension(R.styleable.WeekView_headerWeekDayTitleTextSize, headerWeekDayTitleTextSize)
             headerWeekDaySubtitleTextSize = a.getDimension(R.styleable.WeekView_headerWeekDaySubtitleTextSize, headerWeekDaySubtitleTextSize)
             spaceBetweenHeaderWeekDayTitleAndSubtitle = a.getDimensionPixelSize(R.styleable.WeekView_spaceBetweenHeaderWeekDayTitleAndSubtitle, spaceBetweenHeaderWeekDayTitleAndSubtitle)
-            untitledEventText = a.getString(R.styleable.WeekView_untitledEventText) ?: untitledEventText
+            untitledEventText = a.getString(R.styleable.WeekView_untitledEventText)
+                ?: untitledEventText
         } finally {
             a.recycle()
         }
@@ -1417,7 +1420,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 val isToday = isSameDay(day, today)
 
                 // Don't draw days which are outside requested range
-                if (!dateIsValid(day))
+                if (!isValidDay(day))
                     continue
 
                 // Get more events if necessary.
@@ -1568,7 +1571,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 // Check if the day is today.
                 val isToday = isSameDay(day, today)
                 // Don't draw days which are outside requested range
-                if (!dateIsValid(day)) {
+                if (!isValidDay(day)) {
                     day.add(Calendar.DAY_OF_YEAR, 1)
                     continue
                 }
@@ -1730,8 +1733,9 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     else
                         drawEmptyImage(eventRect.event, eventRect.rectF!!, canvas, topToUse, left)
 
-                } else
+                } else {
                     eventRect.rectF = null
+                }
             }
         }
     }
@@ -2310,8 +2314,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         return overScroller!!.currVelocity <= minimumFlingVelocity
     }
 
-
-/////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
 //
 //      Public methods.
 //
@@ -2399,7 +2402,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
      * @see .setMinDate
      * @see .setMaxDate
      */
-    fun dateIsValid(day: Calendar): Boolean {
+    fun isValidDay(day: Calendar): Boolean {
         if (minDate != null && day.before(minDate))
             return false
         return !(maxDate != null && day.after(maxDate))

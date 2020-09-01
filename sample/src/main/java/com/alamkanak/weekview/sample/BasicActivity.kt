@@ -1,5 +1,7 @@
 package com.alamkanak.weekview.sample
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.core.content.res.ResourcesCompat
 import com.alamkanak.weekview.WeekViewEvent
@@ -11,14 +13,12 @@ import java.util.*
  */
 open class BasicActivity : BaseActivity() {
     var uniqueId: Long = 0
-    fun getUniqueId(): String = uniqueId++.toString()
+    private fun getUniqueId(): String = uniqueId++.toString()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         weekView.isShowNowLine = true
-        weekView.eventCornerRadius = 10.0f
-        weekView.typeface = ResourcesCompat.getFont(this, R.font.lato)
     }
 
     override fun onMonthChange(newYear: Int, newMonth: Int): MutableList<out WeekViewEvent>? {
@@ -26,6 +26,45 @@ open class BasicActivity : BaseActivity() {
         val events = ArrayList<WeekViewEvent>()
 
         var startTime = Calendar.getInstance()
+        startTime.set(2020, 8, 1, 3, 0)
+        var endTime = startTime.clone() as Calendar
+        endTime.set(2020, 8, 1, 4, 0)
+        var event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        events.add(event)
+
+        startTime = Calendar.getInstance()
+        startTime.set(2020, 8, 1, 2, 0)
+        endTime = startTime.clone() as Calendar
+        endTime.set(2020, 8, 1, 3, 30)
+        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        events.add(event)
+
+        startTime = Calendar.getInstance()
+        startTime.set(2020, 8, 1, 1, 0)
+        endTime = startTime.clone() as Calendar
+        endTime.set(2020, 8, 1, 4, 0)
+        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        events.add(event)
+
+        startTime = Calendar.getInstance()
+        startTime.set(2020, 8, 1, 2, 30)
+        endTime = startTime.clone() as Calendar
+        endTime.set(2020, 8, 1, 4, 30)
+        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        events.add(event)
+
+        startTime = Calendar.getInstance()
+        startTime.set(2020, 8, 1, 6, 0)
+        endTime = startTime.clone() as Calendar
+        endTime.set(2020, 8, 1, 9, 30)
+        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        event.color = ResourcesCompat.getColor(resources, R.color.event_color_06, null)
+        events.add(event)
+        /*var startTime = Calendar.getInstance()
         startTime.set(Calendar.HOUR_OF_DAY, 3)
         startTime.set(Calendar.MINUTE, 0)
         startTime.set(Calendar.MONTH, newMonth - 1)
@@ -197,7 +236,7 @@ open class BasicActivity : BaseActivity() {
         event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime, true), null, startTime, endTime, true)
         event.color = ResourcesCompat.getColor(resources, R.color.event_color_02, null)
         events.add(event)
-
+*/
         return events
     }
 

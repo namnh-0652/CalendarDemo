@@ -16,10 +16,10 @@
         app:maxTime="24"
         app:minOverlappingMinutes="30"
         app:minTime="0"
-        app:newEventTimeResolutionInMinutes="15"
+        app:newEventTimeResolutionInMinutes="60"
         app:noOfVisibleDays="1"
         app:timeColumnResolution="60"
-        app:todayColumnBackgroundColor="#1848adff"
+        app:todayColumnBackgroundColor="@android:color/white"
         app:todayHeaderTextColor="@color/accent"
         app:untitledEventText="@string/untitled_event" />
 

@@ -17,8 +17,9 @@ open class WeekViewEvent {
     val isAllDay: Boolean
     var shader: Shader? = null
 
-    /**CTOR for a single, all day event*/
-    constructor(id: String?, name: String?, location: String? = null, allDayTime: Calendar, shader: Shader? = null) : this(id, name, location, allDayTime, allDayTime, true, shader)
+    /** CTOR for a single, all day event */
+    constructor(id: String?, name: String?, location: String? = null, allDayTime: Calendar, shader: Shader? = null)
+        : this(id, name, location, allDayTime, allDayTime, true, shader)
 
     /**
      * Initializes the event for week view.
@@ -31,7 +32,8 @@ open class WeekViewEvent {
      * @param allDay    Is the event an all day event.
      * @param shader    the Shader of the event rectangle
      */
-    @JvmOverloads constructor(id: String?, name: String?, location: String?, startTime: Calendar, endTime: Calendar, allDay: Boolean = false, shader: Shader? = null) {
+    @JvmOverloads
+    constructor(id: String?, name: String?, location: String?, startTime: Calendar, endTime: Calendar, allDay: Boolean = false, shader: Shader? = null) {
         this.id = id
         this.name = name
         this.location = location
@@ -42,7 +44,7 @@ open class WeekViewEvent {
         } else {
             WeekViewUtil.resetTime(startTime)
             this.startTime = startTime
-            if (!WeekViewUtil.isSameDay(startTime, endTime)) {
+            if (!isSameDay(startTime, endTime)) {
                 WeekViewUtil.resetTime(endTime)
                 this.endTime = endTime
             } else
@@ -59,7 +61,8 @@ open class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime   The time when the event ends.
      */
-    constructor(id: String?, name: String?, startTime: Calendar, endTime: Calendar) : this(id, name, null, startTime, endTime)
+    constructor(id: String?, name: String?, startTime: Calendar, endTime: Calendar)
+        : this(id, name, null, startTime, endTime)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -121,7 +124,7 @@ open class WeekViewEvent {
         val colorStr = "#${Integer.toHexString(color)}"
         val startTimeStr = WeekViewUtil.calendarToString(startTime, !isAllDay)
         if (isAllDay) {
-            if (WeekViewUtil.isSameDay(startTime, endTime))
+            if (isSameDay(startTime, endTime))
                 return "allDayEvent(id=$id, time=$startTimeStr..${WeekViewUtil.calendarToString(startTime, false)}, name=$name, location=$location, color=$colorStr ,shader=$shader)"
             return "allDayEvent(id=$id, time=$startTimeStr, name=$name, location=$location, color=$colorStr ,shader=$shader)"
         }

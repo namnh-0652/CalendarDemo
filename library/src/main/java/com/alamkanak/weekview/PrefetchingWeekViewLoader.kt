@@ -14,7 +14,10 @@ import java.util.*
  * @param prefetchingPeriod The amount of periods to be fetched before and after the
  * current period. Must be 1 or greater.
  */
-class PrefetchingWeekViewLoader(val weekViewLoader: WeekViewLoader, @IntRange(from = 1L) val prefetchingPeriod: Int = 1) : WeekViewLoader {
+class PrefetchingWeekViewLoader(
+    private val weekViewLoader: WeekViewLoader,
+    @IntRange(from = 1L) val prefetchingPeriod: Int = 1
+) : WeekViewLoader {
 
     init {
         if (prefetchingPeriod < 1)

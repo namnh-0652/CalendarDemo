@@ -7,24 +7,26 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object WeekViewUtil {
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Helper methods.
-    //
-    /////////////////////////////////////////////////////////////////
+
+    const val SECOND = 1000
+    const val MINUTE = 60 * SECOND
+    const val HOUR = 60 * MINUTE
+    const val DAY = 24 * HOUR
+
 
     /**
      * Checks if two dates are on the same day.
      *
      * @param dateOne The first date.
-     * @param dateTwo The second date.     *
+     * @param dateTwo The second date.
      * @return Whether the dates are on the same day.
      */
     @JvmStatic
     fun isSameDay(dateOne: Calendar, dateTwo: Calendar): Boolean {
         if (dateOne === dateTwo)
             return true
-        return dateOne.get(Calendar.YEAR) == dateTwo.get(Calendar.YEAR) && dateOne.get(Calendar.DAY_OF_YEAR) == dateTwo.get(Calendar.DAY_OF_YEAR)
+        return dateOne.get(Calendar.YEAR) == dateTwo.get(Calendar.YEAR)
+            && dateOne.get(Calendar.DAY_OF_YEAR) == dateTwo.get(Calendar.DAY_OF_YEAR)
     }
 
     /**
@@ -44,8 +46,9 @@ object WeekViewUtil {
 
     @JvmStatic
     fun isSameDayAndHourAndMinute(dateOne: Calendar, dateTwo: Calendar): Boolean {
-        return isSameDay(dateOne, dateTwo) && dateOne.get(Calendar.HOUR_OF_DAY) == dateTwo.get(Calendar.HOUR_OF_DAY)
-                && dateOne.get(Calendar.MINUTE) == dateTwo.get(Calendar.MINUTE)
+        return isSameDay(dateOne, dateTwo)
+            && dateOne.get(Calendar.HOUR_OF_DAY) == dateTwo.get(Calendar.HOUR_OF_DAY)
+            && dateOne.get(Calendar.MINUTE) == dateTwo.get(Calendar.MINUTE)
     }
 
     /**
@@ -57,14 +60,15 @@ object WeekViewUtil {
      */
     @JvmStatic
     fun daysBetween(dateOne: Calendar, dateTwo: Calendar): Int {
-        return ((dateTwo.timeInMillis + dateTwo.timeZone.getOffset(dateTwo.timeInMillis)) / (1000 * 60 * 60 * 24) - (dateOne.timeInMillis + dateOne.timeZone.getOffset(dateOne.timeInMillis)) / (1000 * 60 * 60 * 24)).toInt()
+        return ((dateTwo.timeInMillis + dateTwo.timeZone.getOffset(dateTwo.timeInMillis)) / DAY
+            - (dateOne.timeInMillis + dateOne.timeZone.getOffset(dateOne.timeInMillis)) / DAY).toInt()
     }
 
-    /*
-    * Returns the amount of minutes passed in the day before the time in the given date
-    * @param date
-    * @return amount of minutes in day before time
-    */
+    /**
+     * Returns the amount of minutes passed in the day before the time in the given date
+     * @param date
+     * @return amount of minutes in day before time
+     */
     @JvmStatic
     fun getPassedMinutesInDay(date: Calendar): Int {
         return getPassedMinutesInDay(date.get(Calendar.HOUR_OF_DAY), date.get(Calendar.MINUTE))
@@ -89,7 +93,7 @@ object WeekViewUtil {
         val weekDayFormat = if (shortDate) "EEEEE" else "EEE"
         val defaultDateFormatPattern = "$weekDayFormat d/M"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            val locale = Locale.getDefault()
+            val locale = Locale.JAPAN
             var bestDateTimePattern = DateFormat.getBestDateTimePattern(locale, defaultDateFormatPattern)
             //workaround fix for this issue: https://issuetracker.google.com/issues/79311044
             //TODO if there is a better API that doesn't require this workaround, use it. Be sure to check vs all locales, as done here: https://issuetracker.google.com/issues/37044127
@@ -100,7 +104,7 @@ object WeekViewUtil {
         try {
             val dateFormatOrder = DateFormat.getDateFormatOrder(context)
             if (dateFormatOrder.isEmpty())
-                return SimpleDateFormat(defaultDateFormatPattern, Locale.getDefault())
+                return SimpleDateFormat(defaultDateFormatPattern, Locale.JAPAN)
             val sb = StringBuilder()
             for (i in dateFormatOrder.indices) {
                 val c = dateFormatOrder[i]
@@ -114,9 +118,9 @@ object WeekViewUtil {
                 }
             }
             val dateFormatString = sb.toString()
-            return SimpleDateFormat("$weekDayFormat $dateFormatString", Locale.getDefault())
+            return SimpleDateFormat("$weekDayFormat $dateFormatString", Locale.JAPAN)
         } catch (e: Exception) {
-            return SimpleDateFormat(defaultDateFormatPattern, Locale.getDefault())
+            return SimpleDateFormat(defaultDateFormatPattern, Locale.JAPAN)
         }
     }
 
@@ -124,25 +128,22 @@ object WeekViewUtil {
     fun calendarToString(cal: Calendar?, includeTime: Boolean = true): String {
         if (cal == null)
             return ""
-        val sb = StringBuilder()
+        var time: String
         with(cal) {
-            sb.append(get(Calendar.YEAR).toString()).append('-').append((get(Calendar.MONTH) + 1).toString())
-                    .append('-').append(get(Calendar.DAY_OF_MONTH).toString())
+            time = "${get(Calendar.YEAR)}-${get(Calendar.MONTH) + 1}-${get(Calendar.DAY_OF_MONTH)}"
             if (includeTime)
-                sb.append(" ").append(get(Calendar.HOUR_OF_DAY).toString()).append(':').append(get(Calendar.MINUTE).toString()).append(':')
-                        .append(get(Calendar.SECOND).toString()).append('.').append(get(Calendar.MILLISECOND).toString())
+                time.plus(" ${get(Calendar.HOUR_OF_DAY)}:${get(Calendar.MINUTE)}:${get(Calendar.SECOND)}.${get(Calendar.MILLISECOND)}")
         }
-        return sb.toString()
+        return time
     }
 
     @JvmStatic
     fun resetTime(cal: Calendar) {
-        with(cal)
-        {
-            set(java.util.Calendar.HOUR_OF_DAY, 0)
-            set(java.util.Calendar.SECOND, 0)
-            set(java.util.Calendar.MINUTE, 0)
-            set(java.util.Calendar.MILLISECOND, 0)
+        with(cal) {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.MILLISECOND, 0)
         }
     }
 }

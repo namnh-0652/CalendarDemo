@@ -16,6 +16,8 @@ open class BasicActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        weekView.isShowNowLine = true
+        weekView.eventCornerRadius = 10.0f
         weekView.typeface = ResourcesCompat.getFont(this, R.font.lato)
     }
 
@@ -58,6 +60,19 @@ open class BasicActivity : BaseActivity() {
         endTime.set(Calendar.MONTH, newMonth - 1)
         event = WeekViewEvent("Second", getEventTitle(startTime, endTime), startTime, endTime)
         event.color = ResourcesCompat.getColor(resources, R.color.event_color_05, null)
+        events.add(event)
+
+        startTime = Calendar.getInstance()
+        startTime.set(Calendar.HOUR_OF_DAY, 2)
+        startTime.set(Calendar.MINUTE, 30)
+        startTime.set(Calendar.MONTH, newMonth - 1)
+        startTime.set(Calendar.YEAR, newYear)
+        endTime = startTime.clone() as Calendar
+        endTime.set(Calendar.HOUR_OF_DAY, 4)
+        endTime.set(Calendar.MINUTE, 0)
+        endTime.set(Calendar.MONTH, newMonth - 1)
+        event = WeekViewEvent("third", getEventTitle(startTime, endTime), startTime, endTime)
+        event.color = ResourcesCompat.getColor(resources, R.color.event_color_03, null)
         events.add(event)
 
         startTime = Calendar.getInstance()

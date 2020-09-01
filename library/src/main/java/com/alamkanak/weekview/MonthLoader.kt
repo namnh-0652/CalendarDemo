@@ -20,9 +20,7 @@ class MonthLoader(var onMonthChangeListener: MonthChangeListener?) : WeekViewLoa
          * **That's why you can have three times the same event at the same place if you mess up with the configuration**
          *
          * @param newYear  : year of the events required by the view.
-         * @param newMonth :
-         *
-         *month of the events required by the view **1 based (not like JAVA API) : January = 1 and December = 12**.
+         * @param newMonth : month of the events required by the view **1 based (not like JAVA API) : January = 1 and December = 12**.
          * @return a list of the events happening **during the specified month**.
          */
         fun onMonthChange(newYear: Int, newMonth: Int): MutableList<out WeekViewEvent>?

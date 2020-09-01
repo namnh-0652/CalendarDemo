@@ -14,13 +14,14 @@ import com.alamkanak.weekview.WeekViewEvent
 import kotlinx.android.synthetic.main.activity_base.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
 
 
 /**
  * Activity to demonstrate snapping of the whole view, for example week-by-week.
  */
 class WholeViewSnappingActivity : BasicActivity() {
-    val locale = Locale.getDefault()
+    val locale = Locale.JAPAN
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,11 +34,11 @@ class WholeViewSnappingActivity : BasicActivity() {
         weekView.hourSeparatorHeight = weekView.columnGap
         weekView.isScrollNumberOfVisibleDays = true
         weekView.dropListener = null
-        weekView.allDaySideTitleText = getString(R.string.all_day)
+//        weekView.allDaySideTitleText = getString(R.string.all_day)
         setDayViewType(TYPE_WEEK_VIEW)
         val cal = Calendar.getInstance()
         val currentHour = cal.get(Calendar.HOUR_OF_DAY) + cal.get(Calendar.MINUTE) / 60.0
-        weekView.goToHour(Math.max(currentHour - 1, 0.0))
+        weekView.goToHour(max(currentHour - 1, 0.0))
         cal.set(Calendar.DAY_OF_WEEK, cal.firstDayOfWeek)
         weekView.goToDate(cal)
         weekView.scrollListener = object : WeekView.ScrollListener {
@@ -77,7 +78,7 @@ class WholeViewSnappingActivity : BasicActivity() {
             set(Calendar.MILLISECOND, 0)
         }
         val timeFormat = DateFormat.getTimeFormat(this)
-                ?: SimpleDateFormat("HH:mm", locale)
+            ?: SimpleDateFormat("HH:mm", locale)
         val dateFormatTitle = SimpleDateFormat("EEE", locale)
         weekView.dateTimeInterpreter = object : DateTimeInterpreter {
             override fun getFormattedTimeOfDay(hour: Int, minutes: Int): String {

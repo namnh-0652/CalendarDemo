@@ -28,10 +28,13 @@ abstract class BaseActivity : AppCompatActivity(), WeekView.EventClickListener, 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         shortDateFormat = WeekViewUtil.getWeekdayWithNumericDayAndMonthFormat(this, true)
-        timeFormat = android.text.format.DateFormat.getTimeFormat(this) ?: SimpleDateFormat("HH:mm", Locale.getDefault())
+//        timeFormat = android.text.format.DateFormat.getTimeFormat(this)
+//            ?: SimpleDateFormat("HH:mm", Locale.JAPAN)
+        timeFormat = SimpleDateFormat("H:mm", Locale.JAPAN)
         setContentView(R.layout.activity_base)
 
         draggable_view.setOnLongClickListener(DragTapListener())
+        weekView.enableAllDayEvent = true
 
         // Get a reference for the week view in the layout.
 
@@ -109,8 +112,7 @@ abstract class BaseActivity : AppCompatActivity(), WeekView.EventClickListener, 
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        when (id) {
+        when (item.itemId) {
             R.id.action_today -> {
                 weekView.goToToday()
                 return true
@@ -237,7 +239,7 @@ abstract class BaseActivity : AppCompatActivity(), WeekView.EventClickListener, 
     }
 
     override fun onDrop(view: View, date: Calendar) {
-        Toast.makeText(this, "View dropped to " + date.toString(), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "View dropped to $date", Toast.LENGTH_SHORT).show()
     }
 
     companion object {

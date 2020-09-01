@@ -12,8 +12,9 @@ open class WeekViewEvent {
     var name: String? = null
     var location: String? = null
     @ColorInt
-    @get:ColorInt
-    var color: Int = 0
+    var backgroundColor: Int = 0
+    @ColorInt
+    var borderColor: Int = 0
     val isAllDay: Boolean
     var shader: Shader? = null
 
@@ -33,7 +34,8 @@ open class WeekViewEvent {
      * @param shader    the Shader of the event rectangle
      */
     @JvmOverloads
-    constructor(id: String?, name: String?, location: String?, startTime: Calendar, endTime: Calendar, allDay: Boolean = false, shader: Shader? = null) {
+    constructor(id: String?, name: String?, location: String?, startTime: Calendar, endTime: Calendar,
+                allDay: Boolean = false, shader: Shader? = null, description: String? = null) {
         this.id = id
         this.name = name
         this.location = location
@@ -89,7 +91,7 @@ open class WeekViewEvent {
         endTime.set(Calendar.HOUR_OF_DAY, 23)
         endTime.set(Calendar.MINUTE, 59)
         val event1 = WeekViewEvent(this.id, this.name, this.location, this.startTime, endTime, this.isAllDay)
-        event1.color = this.color
+        event1.backgroundColor = this.backgroundColor
         events.add(event1)
         // Add other days.
         if (!isSameDay(this.startTime, this.endTime)) {
@@ -103,7 +105,7 @@ open class WeekViewEvent {
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23)
                 endOfOverDay.set(Calendar.MINUTE, 59)
                 val eventMore = WeekViewEvent(this.id, this.name, null, overDay, endOfOverDay, this.isAllDay)
-                eventMore.color = this.color
+                eventMore.backgroundColor = this.backgroundColor
                 events.add(eventMore)
 
                 // Add next day.
@@ -114,21 +116,21 @@ open class WeekViewEvent {
             startTime.set(Calendar.HOUR_OF_DAY, 0)
             startTime.set(Calendar.MINUTE, 0)
             val event2 = WeekViewEvent(this.id, this.name, this.location, startTime, this.endTime, this.isAllDay)
-            event2.color = this.color
+            event2.backgroundColor = this.backgroundColor
             events.add(event2)
         }
         return events
     }
 
     override fun toString(): String {
-        val colorStr = "#${Integer.toHexString(color)}"
+        val colorStr = "#${Integer.toHexString(backgroundColor)}"
         val startTimeStr = WeekViewUtil.calendarToString(startTime, !isAllDay)
         if (isAllDay) {
             if (isSameDay(startTime, endTime))
-                return "allDayEvent(id=$id, time=$startTimeStr..${WeekViewUtil.calendarToString(startTime, false)}, name=$name, location=$location, color=$colorStr ,shader=$shader)"
-            return "allDayEvent(id=$id, time=$startTimeStr, name=$name, location=$location, color=$colorStr ,shader=$shader)"
+                return "allDayEvent(id=$id, time=$startTimeStr..${WeekViewUtil.calendarToString(startTime, false)}, name=$name, location=$location, backgroundColor=$colorStr ,shader=$shader)"
+            return "allDayEvent(id=$id, time=$startTimeStr, name=$name, location=$location, backgroundColor=$colorStr ,shader=$shader)"
         }
         val endTimeStr = WeekViewUtil.calendarToString(endTime, true)
-        return "normalEvent(id=$id, startTime=$colorStr, endTime=$endTimeStr, name=$name, location=$location, color=$colorStr , shader=$shader)"
+        return "normalEvent(id=$id, startTime=$colorStr, endTime=$endTimeStr, name=$name, location=$location, backgroundColor=$colorStr , shader=$shader)"
     }
 }

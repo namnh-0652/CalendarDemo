@@ -68,7 +68,7 @@ class Event {
 
         // Create an week view event.
         val weekViewEvent = WeekViewEvent(name, name, null, startTime, endTime)
-        weekViewEvent.color = Color.parseColor(color)
+        weekViewEvent.backgroundColor = Color.parseColor(color)
 
         return weekViewEvent
     }

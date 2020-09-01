@@ -3,7 +3,8 @@ package com.alamkanak.weekview.sample
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.core.content.res.ResourcesCompat
+import android.view.Menu
+import androidx.core.content.ContextCompat
 import com.alamkanak.weekview.WeekViewEvent
 import kotlinx.android.synthetic.main.activity_base.*
 import java.util.*
@@ -18,7 +19,18 @@ open class BasicActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        weekView.eventBorderWidth = 2f
         weekView.isShowNowLine = true
+        supportActionBar?.apply {
+            setHomeAsUpIndicator(R.drawable.ic_arrow_back)
+            setDisplayHomeAsUpEnabled(true)
+            title = ""
+            setBackgroundDrawable(ColorDrawable(Color.WHITE))
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        return false
     }
 
     override fun onMonthChange(newYear: Int, newMonth: Int): MutableList<out WeekViewEvent>? {
@@ -29,8 +41,10 @@ open class BasicActivity : BaseActivity() {
         startTime.set(2020, 8, 1, 3, 0)
         var endTime = startTime.clone() as Calendar
         endTime.set(2020, 8, 1, 4, 0)
-        var event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
-        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        var event = WeekViewEvent(id = getUniqueId(), name = getEventTitle(startTime, endTime), startTime = startTime, endTime = endTime)
+        event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
+        event.location = "A倉庫 -> B倉庫"
+        event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -38,7 +52,8 @@ open class BasicActivity : BaseActivity() {
         endTime = startTime.clone() as Calendar
         endTime.set(2020, 8, 1, 3, 30)
         event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
-        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
+        event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -46,7 +61,8 @@ open class BasicActivity : BaseActivity() {
         endTime = startTime.clone() as Calendar
         endTime.set(2020, 8, 1, 4, 0)
         event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
-        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
+        event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -54,7 +70,8 @@ open class BasicActivity : BaseActivity() {
         endTime = startTime.clone() as Calendar
         endTime.set(2020, 8, 1, 4, 30)
         event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
-        event.color = ResourcesCompat.getColor(resources, R.color.event_color_07, null)
+        event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
+        event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
         events.add(event)
 
         startTime = Calendar.getInstance()
@@ -62,7 +79,8 @@ open class BasicActivity : BaseActivity() {
         endTime = startTime.clone() as Calendar
         endTime.set(2020, 8, 1, 9, 30)
         event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
-        event.color = ResourcesCompat.getColor(resources, R.color.event_color_06, null)
+        event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_06)
+        event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_06)
         events.add(event)
         /*var startTime = Calendar.getInstance()
         startTime.set(Calendar.HOUR_OF_DAY, 3)

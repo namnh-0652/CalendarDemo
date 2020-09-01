@@ -29,7 +29,7 @@ import kotlin.math.*
 class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : View(context, attrs, defStyleAttr) {
     // region fields and properties
-    val drawPerformanceTester = DrawPerformanceTester(true)
+    private val drawPerformanceTester = DrawPerformanceTester(true)
     private var mHomeDate: Calendar? = null
     /**
      *  the earliest day that can be displayed.  null if no minimum date is set.
@@ -164,6 +164,10 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
      *  corner radius for event rect (in px)
      */
     var eventCornerRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, resources.displayMetrics)
+    /**
+     * Border width of event rect (in px)
+     */
+    var eventBorderWidth = 0f
     /**
      *  whether the week view should fling horizontally.
      */
@@ -439,7 +443,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                         // Add the new event if its bounds are valid
                         if (left < right && left < width && top < height && right > headerColumnWidth && bottom > 0) {
                             val dayRectF = RectF(left, top, right, bottom - currentOrigin.y)
-                            newEvent.color = newEventColor
+                            newEvent.backgroundColor = newEventColor
                             newEventRect = EventRect(newEvent, newEvent, dayRectF)
                             tempEvents.add(newEvent)
                             clearEvents()
@@ -1014,7 +1018,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         timeChangedBroadcastReceiver.register(context, Calendar.getInstance())
         textColorPicker = object : TextColorPicker {
             override fun getTextColor(event: WeekViewEvent): Int {
-                val color = event.color
+                val color = event.backgroundColor
                 val a = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255
                 return if (a < 0.2) Color.BLACK else Color.WHITE
             }
@@ -1721,9 +1725,25 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 if (left < right && left < width && top < height && right > headerColumnWidth &&
                     bottom > headerHeight + weekDaysHeaderRowTotalPadding + timeTextHeight / 2 + spaceBelowAllDayEvents) {
                     eventRect.rectF = RectF(left, top, right, bottom)
-                    eventBackgroundPaint.color = if (eventRect.event.color == 0) defaultEventColor else eventRect.event.color
+                    if (eventBorderWidth > 0f) {
+                        eventBackgroundPaint.strokeWidth = eventBorderWidth
+                        eventBackgroundPaint.color = if (eventRect.event.borderColor == 0) defaultEventColor else eventRect.event.borderColor
+//                        canvas.drawRoundRect(eventRect.rectF!!, eventCornerRadius, eventCornerRadius, eventBackgroundPaint)
+                        eventRect.rectF?.run {
+                            canvas.drawRoundRect(left, top, right, bottom, eventCornerRadius, eventCornerRadius, eventBackgroundPaint)
+                        }
+                    }
+
+                    eventBackgroundPaint.color = if (eventRect.event.backgroundColor == 0) defaultEventColor else eventRect.event.backgroundColor
                     eventBackgroundPaint.shader = eventRect.event.shader
-                    canvas.drawRoundRect(eventRect.rectF!!, eventCornerRadius, eventCornerRadius, eventBackgroundPaint)
+                    if (eventBorderWidth > 0f) {
+                        eventRect.rectF?.run {
+                            canvas.drawRoundRect(left + eventBorderWidth, top + eventBorderWidth, right - eventBorderWidth, bottom - eventBorderWidth, eventCornerRadius, eventCornerRadius, eventBackgroundPaint)
+                        }
+//                        canvas.drawRoundRect(eventRect.rectF!!, eventCornerRadius, eventCornerRadius, eventBackgroundPaint)
+                    } else {
+                        canvas.drawRoundRect(eventRect.rectF!!, eventCornerRadius, eventCornerRadius, eventBackgroundPaint)
+                    }
                     var topToUse = top
                     if (eventRect.event.startTime.get(Calendar.HOUR_OF_DAY) < minTime)
                         topToUse = hourHeight * getPassedMinutesInDay(minTime, 0) / 60 + eventsTop
@@ -1768,7 +1788,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 // Draw the event and the event name on top of it.
                 if (left < right && left < width && top < height && right > headerColumnWidth && bottom > 0) {
                     eventRect.rectF = RectF(left, top, right, bottom)
-                    eventBackgroundPaint.color = if (eventRect.event.color == 0) defaultEventColor else eventRect.event.color
+                    eventBackgroundPaint.color = if (eventRect.event.backgroundColor == 0) defaultEventColor else eventRect.event.backgroundColor
                     eventBackgroundPaint.shader = eventRect.event.shader
                     canvas.drawRoundRect(eventRect.rectF!!, eventCornerRadius, eventCornerRadius, eventBackgroundPaint)
                     drawEventTitle(eventRect.event, eventRect.rectF!!, canvas, top, left)
@@ -1802,7 +1822,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         // Prepare the location of the event.
         if (!TextUtils.isEmpty(event.location)) {
             if (bob.isNotEmpty())
-                bob.append(' ')
+                bob.append("\n")
             bob.append(event.location)
         }
 

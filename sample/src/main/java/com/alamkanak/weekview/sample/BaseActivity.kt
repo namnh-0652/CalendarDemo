@@ -27,13 +27,14 @@ abstract class BaseActivity : AppCompatActivity(), WeekView.EventClickListener, 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Locale.setDefault(Locale.JAPAN)
         shortDateFormat = WeekViewUtil.getWeekdayWithNumericDayAndMonthFormat(this, true)
 //        timeFormat = android.text.format.DateFormat.getTimeFormat(this)
 //            ?: SimpleDateFormat("HH:mm", Locale.JAPAN)
         timeFormat = SimpleDateFormat("H:mm", Locale.JAPAN)
         setContentView(R.layout.activity_base)
 
-        draggable_view.setOnLongClickListener(DragTapListener())
+//        draggable_view.setOnLongClickListener(DragTapListener())
         weekView.enableAllDayEvent = true
 
         // Get a reference for the week view in the layout.

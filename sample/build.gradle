@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.alamkanak.weekview"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -31,7 +31,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation project(':library')
     implementation 'androidx.core:core-ktx:1.3.1'
-
+    implementation 'com.github.prolificinteractive:material-calendarview:2.0.1'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.1.1'
 //    implementation 'com.github.AndroidDeveloperLB:Android-Week-View:ef94b8d256'
 //    implementation 'com.github.AndroidDeveloperLB:Android-Week-View:develop-SNAPSHOT'
 //    implementation 'com.github.AndroidDeveloperLB:Android-Week-View:develop-v2.3.0-gef94b8d-26'

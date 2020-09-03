@@ -1,35 +1,75 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".BaseActivity">
 
-    <com.alamkanak.weekview.WeekView
-        android:id="@+id/weekView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:autoLimitTime="false"
-        app:dayBackgroundColor="#05000000"
-        app:headerColumnTextColor="@color/toolbar_text"
-        app:headerRowBackgroundColor="@color/toolbar"
-        app:maxTime="24"
-        app:minOverlappingMinutes="30"
-        app:minTime="0"
-        app:newEventTimeResolutionInMinutes="60"
-        app:noOfVisibleDays="1"
-        app:timeColumnResolution="60"
-        app:todayColumnBackgroundColor="@android:color/white"
-        app:todayHeaderTextColor="@color/accent"
-        app:untitledEventText="@string/untitled_event" />
-
     <TextView
-        android:id="@+id/draggable_view"
+        android:id="@+id/tv_month"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#ffff0000"
-        android:padding="3dp"
-        android:text="@string/drag_me"
-        android:textColor="@android:color/white" />
+        android:layout_gravity="top|start"
+        android:layout_marginStart="16dp"
+        android:textColor="#000"
+        android:textSize="20sp"
+        android:visibility="gone"
+        tools:text="2020年9月" />
 
-</RelativeLayout>
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendar1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:mcv_calendarMode="week"
+        app:mcv_dateTextAppearance="@style/DayStyle"
+        app:mcv_firstDayOfWeek="sunday"
+        app:mcv_showWeekDays="true"
+        app:mcv_tileHeight="36dp"
+        app:mcv_tileWidth="0dp" />
+
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="#fff"
+        android:visibility="gone"
+        app:mcv_calendarMode="month"
+        app:mcv_firstDayOfWeek="sunday" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.alamkanak.weekview.WeekView
+            android:id="@+id/weekView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:autoLimitTime="false"
+            app:dayBackgroundColor="#05000000"
+            app:headerColumnTextColor="@color/toolbar_text"
+            app:headerRowBackgroundColor="@color/toolbar"
+            app:maxTime="24"
+            app:minOverlappingMinutes="30"
+            app:minTime="0"
+            app:newEventTimeResolutionInMinutes="60"
+            app:noOfVisibleDays="1"
+            app:timeColumnResolution="60"
+            app:todayColumnBackgroundColor="@android:color/white"
+            app:todayHeaderTextColor="@color/accent"
+            app:untitledEventText="@string/untitled_event" />
+
+        <TextView
+            android:id="@+id/draggable_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#ffff0000"
+            android:padding="3dp"
+            android:text="@string/drag_me"
+            android:textColor="@android:color/white"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+</LinearLayout>

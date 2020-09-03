@@ -2,11 +2,22 @@ package com.alamkanak.weekview.sample
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.TextAppearanceSpan
 import android.view.Menu
+import android.view.View
 import androidx.core.content.ContextCompat
 import com.alamkanak.weekview.WeekViewEvent
+import com.prolificinteractive.materialcalendarview.CalendarDay
+import com.prolificinteractive.materialcalendarview.DayViewDecorator
+import com.prolificinteractive.materialcalendarview.DayViewFacade
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView
 import kotlinx.android.synthetic.main.activity_base.*
+import org.threeten.bp.DayOfWeek
 import java.util.*
 
 /**
@@ -15,17 +26,84 @@ import java.util.*
 open class BasicActivity : BaseActivity() {
     var uniqueId: Long = 0
     private fun getUniqueId(): String = uniqueId++.toString()
+    private val dayLabels by lazy {
+        resources.getStringArray(R.array.custom_weekdays)
+    }
 
+    private fun setTodayDecorator(calendar: MaterialCalendarView) {
+        val background = resources.getDrawable(R.drawable.bg_calendar_today, theme)
+        val textAppearance = TextAppearanceSpan(this, R.style.TodayStyle)
+        val todayDecorator = TodayDecorator(CalendarDay.today(), textAppearance, background)
+        calendar.addDecorator(todayDecorator)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        calendar1.selectionColor = Color.parseColor("#e6f5fa")
+        calendar1.topbarVisible = false
+        calendar1.setHeaderTextAppearance(R.style.HeaderStyle)
+        calendar1.setWeekDayLabels(dayLabels)
+        setTodayDecorator(calendar1)
+
+        calendar1.setWeekDayFormatter { dayOfWeek ->
+            val daySpan = SpannableString(dayLabels[dayOfWeek.ordinal])
+            when (dayOfWeek) {
+                DayOfWeek.SATURDAY -> {
+                    daySpan.setSpan(ForegroundColorSpan(Color.RED), 0, daySpan.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                DayOfWeek.SUNDAY -> {
+                    daySpan.setSpan(ForegroundColorSpan(Color.BLUE), 0, daySpan.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                else -> {
+                    daySpan.setSpan(ForegroundColorSpan(Color.BLACK), 0, daySpan.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
+            daySpan
+        }
+
+        calendar1.setOnMonthChangedListener { _, date ->
+            tv_month.text = "${date.year}年${date.month}月"
+        }
+        calendar2.topbarVisible = false
+        calendar2.setOnMonthChangedListener { _, date ->
+            tv_month.text = "${date.year}年${date.month}月"
+        }
+
+        tv_month.setOnClickListener {
+            if (calendar1.visibility == View.VISIBLE) {
+                calendar1.visibility = View.GONE
+                calendar2.visibility = View.VISIBLE
+            } else {
+                calendar1.visibility = View.VISIBLE
+                calendar2.visibility = View.GONE
+            }
+        }
+
         weekView.eventBorderWidth = 2f
         weekView.isShowNowLine = true
-        supportActionBar?.apply {
+        weekView.showColumnsDayTitle = false
+        weekView.weekDayHeaderRowPaddingTop = 0f
+        weekView.weekDayHeaderRowPaddingBottom = 0f
+        /*supportActionBar?.apply {
             setHomeAsUpIndicator(R.drawable.ic_arrow_back)
             setDisplayHomeAsUpEnabled(true)
             title = ""
+            elevation = 0f
             setBackgroundDrawable(ColorDrawable(Color.WHITE))
+        }*/
+    }
+
+    inner class TodayDecorator(private val today: CalendarDay,
+                               private val textAppearanceSpan: TextAppearanceSpan,
+                               private val background: Drawable
+    ) : DayViewDecorator {
+        override fun shouldDecorate(day: CalendarDay?): Boolean {
+            return day != null && day == today
+        }
+
+        override fun decorate(view: DayViewFacade?) {
+            view?.setBackgroundDrawable(background)
+            view?.addSpan(textAppearanceSpan)
         }
     }
 
@@ -38,47 +116,51 @@ open class BasicActivity : BaseActivity() {
         val events = ArrayList<WeekViewEvent>()
 
         var startTime = Calendar.getInstance()
-        startTime.set(2020, 8, 1, 3, 0)
+        startTime.set(2020, 8, 4, 3, 0)
         var endTime = startTime.clone() as Calendar
-        endTime.set(2020, 8, 1, 4, 0)
-        var event = WeekViewEvent(id = getUniqueId(), name = getEventTitle(startTime, endTime), startTime = startTime, endTime = endTime)
+        endTime.set(2020, 8, 4, 4, 0)
+        var event = WeekViewEvent(getUniqueId(), "YYZZ", startTime, endTime)
         event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
-        event.location = "A倉庫 -> B倉庫"
+        event.location = "YYY -> ZZZ"
         event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
         events.add(event)
 
         startTime = Calendar.getInstance()
-        startTime.set(2020, 8, 1, 2, 0)
+        startTime.set(2020, 8, 4, 2, 0)
         endTime = startTime.clone() as Calendar
-        endTime.set(2020, 8, 1, 3, 30)
-        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
-        event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
-        event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
-        events.add(event)
-
-        startTime = Calendar.getInstance()
-        startTime.set(2020, 8, 1, 1, 0)
-        endTime = startTime.clone() as Calendar
-        endTime.set(2020, 8, 1, 4, 0)
-        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        endTime.set(2020, 8, 4, 3, 30)
+        event = WeekViewEvent(getUniqueId(), "AABB", startTime, endTime)
+        event.location = "AAA -> BBB"
         event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
         event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
         events.add(event)
 
         startTime = Calendar.getInstance()
-        startTime.set(2020, 8, 1, 2, 30)
+        startTime.set(2020, 8, 4, 1, 0)
         endTime = startTime.clone() as Calendar
-        endTime.set(2020, 8, 1, 4, 30)
-        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        endTime.set(2020, 8, 4, 4, 0)
+        event = WeekViewEvent(getUniqueId(), "CCDD", startTime, endTime)
+        event.location = "CCC -> DDD"
         event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
         event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
         events.add(event)
 
         startTime = Calendar.getInstance()
-        startTime.set(2020, 8, 1, 6, 0)
+        startTime.set(2020, 8, 4, 2, 30)
         endTime = startTime.clone() as Calendar
-        endTime.set(2020, 8, 1, 9, 30)
-        event = WeekViewEvent(getUniqueId(), getEventTitle(startTime, endTime), startTime, endTime)
+        endTime.set(2020, 8, 4, 4, 30)
+        event = WeekViewEvent(getUniqueId(), "EEFF", startTime, endTime)
+        event.location = "EEE -> FFF"
+        event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_07)
+        event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_07)
+        events.add(event)
+
+        startTime = Calendar.getInstance()
+        startTime.set(2020, 8, 4, 6, 0)
+        endTime = startTime.clone() as Calendar
+        endTime.set(2020, 8, 4, 9, 30)
+        event = WeekViewEvent(getUniqueId(), "GGHH", startTime, endTime)
+        event.location = "GGG -> HHH"
         event.backgroundColor = ContextCompat.getColor(this, R.color.event_color_06)
         event.borderColor = ContextCompat.getColor(this, R.color.border_event_color_06)
         events.add(event)

@@ -12,4 +12,14 @@
     <string name="title_activity_whole_view_snap">Whole view snap</string>
     <string name="all_day">All day</string>
     <string name="untitled_event">Untitled event</string>
+
+    <string-array name="custom_weekdays">
+        <item>月</item>
+        <item>火</item>
+        <item>水</item>
+        <item>木</item>
+        <item>金</item>
+        <item>土</item>
+        <item>日</item>
+    </string-array>
 </resources>

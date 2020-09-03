@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.*
 import android.text.format.DateFormat
+import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.util.AttributeSet
 import android.util.TypedValue
@@ -99,7 +100,12 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
     private val eventBackgroundPaint = Paint()
     private val newEventBackgroundPaint = Paint()
     private var containsAllDayEvent: Boolean = false
-    var enableAllDayEvent: Boolean = false
+    var enableAllDayEvent: Boolean = true
+    var showColumnsDayTitle: Boolean = true
+        set(value) {
+            if (!value) headerWeekDayTitleTextHeight = 0f
+            field = value
+        }
     private var timeTextWidth: Float = 0f
     private var timeTextHeight: Float = 0f
     var headerWeekDayTitleTextHeight: Float = 0f
@@ -610,7 +616,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         }
 
     /**
-     *  the first day of the week. First day of the week is used only when the week view is first
+     * the first day of the week. First day of the week is used only when the week view is first
      * drawn. It does not of any effect after user starts scrolling horizontally.
      *
      * **Note:** This method will only work if the week view is set to display more than 6 days at
@@ -1131,6 +1137,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         sideTitleTextPaint.color = headerColumnTextColor
         sideTitleTextPaint.typeface = typeface
         sideTitleTextPaint.textSize = headerWeekDayTitleTextSize
+
         // handle sideSubtitleTextPaint
         sideSubtitleTextPaint.textSize = headerWeekDaySubtitleTextSize
         sideSubtitleTextPaint.color = headerColumnTextColor
@@ -1149,7 +1156,7 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         headerWeekDayTitleTextPaint.textSize = headerWeekDayTitleTextSize
         headerWeekDayTitleTextPaint.typeface = typeface
         headerWeekDayTitleTextPaint.getTextBounds(sampleText, 0, sampleText.length, rect)
-        headerWeekDayTitleTextHeight = rect.height().toFloat()
+        headerWeekDayTitleTextHeight = if (showColumnsDayTitle) rect.height().toFloat() else 0f
 
         //measure settings for header subtitle
         headerWeekDaySubtitleTextPaint.color = headerColumnTextColor
@@ -1525,81 +1532,82 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         }
 
         canvas.restore()
+        if (showColumnsDayTitle) {
+            // Hide everything in the first cell (top left corner).
+            canvas.save()
+            canvas.clipRect(0f, 0f, headerColumnWidth, headerHeight + weekDaysHeaderRowTotalPadding)
+            val headerTitleAndSubtitleTextHeight = headerWeekDayTitleTextHeight + (if (isSubtitleHeaderEnabled) headerWeekDaySubtitleTextHeight + spaceBetweenHeaderWeekDayTitleAndSubtitle else 0.0f)
+            if (enableDrawHeaderBackgroundOnlyOnWeekDays)
+                canvas.drawRect(0f, 0f, headerColumnWidth, headerTitleAndSubtitleTextHeight + weekDaysHeaderRowTotalPadding, headerBackgroundPaint)
+            else
+                canvas.drawRect(canvas.clipBounds, headerBackgroundPaint)
 
-        // Hide everything in the first cell (top left corner).
-        canvas.save()
-        canvas.clipRect(0f, 0f, headerColumnWidth, headerHeight + weekDaysHeaderRowTotalPadding)
-        val headerTitleAndSubtitleTextHeight = headerWeekDayTitleTextHeight + (if (isSubtitleHeaderEnabled) headerWeekDaySubtitleTextHeight + spaceBetweenHeaderWeekDayTitleAndSubtitle else 0.0f)
-        if (enableDrawHeaderBackgroundOnlyOnWeekDays)
-            canvas.drawRect(0f, 0f, headerColumnWidth, headerTitleAndSubtitleTextHeight + weekDaysHeaderRowTotalPadding, headerBackgroundPaint)
-        else
-            canvas.drawRect(canvas.clipBounds, headerBackgroundPaint)
-
-        // draw text on the left of the week days
-        when {
-            //TODO set left column size based on possible text of sideTitle and sideSubtitle,
-            // or auto-resize text according to available space
-            !TextUtils.isEmpty(sideTitleText) && TextUtils.isEmpty(sideSubtitleText) ->
-                canvas.drawText(sideTitleText!!, headerColumnWidth / 2, (headerTitleAndSubtitleTextHeight + headerWeekDayTitleTextHeight) / 2.0f + weekDayHeaderRowPaddingTop, sideTitleTextPaint)
-            !TextUtils.isEmpty(sideTitleText) && !TextUtils.isEmpty(sideSubtitleText) -> {
-                canvas.drawText(sideTitleText!!, headerColumnWidth / 2, headerWeekDayTitleTextHeight + weekDayHeaderRowPaddingTop, sideTitleTextPaint)
-                canvas.drawText(sideSubtitleText!!, headerColumnWidth / 2, headerTitleAndSubtitleTextHeight + weekDayHeaderRowPaddingTop, sideSubtitleTextPaint)
+            // draw text on the left of the week days
+            when {
+                //TODO set left column size based on possible text of sideTitle and sideSubtitle,
+                // or auto-resize text according to available space
+                !TextUtils.isEmpty(sideTitleText) && TextUtils.isEmpty(sideSubtitleText) ->
+                    canvas.drawText(sideTitleText!!, headerColumnWidth / 2, (headerTitleAndSubtitleTextHeight + headerWeekDayTitleTextHeight) / 2.0f + weekDayHeaderRowPaddingTop, sideTitleTextPaint)
+                !TextUtils.isEmpty(sideTitleText) && !TextUtils.isEmpty(sideSubtitleText) -> {
+                    canvas.drawText(sideTitleText!!, headerColumnWidth / 2, headerWeekDayTitleTextHeight + weekDayHeaderRowPaddingTop, sideTitleTextPaint)
+                    canvas.drawText(sideSubtitleText!!, headerColumnWidth / 2, headerTitleAndSubtitleTextHeight + weekDayHeaderRowPaddingTop, sideSubtitleTextPaint)
+                }
+                TextUtils.isEmpty(sideTitleText) && !TextUtils.isEmpty(sideSubtitleText) ->
+                    canvas.drawText(sideSubtitleText!!, headerColumnWidth / 2, (headerTitleAndSubtitleTextHeight + sideSubtitleTextPaint.textSize) / 2.0f + weekDayHeaderRowPaddingTop, sideSubtitleTextPaint)
             }
-            TextUtils.isEmpty(sideTitleText) && !TextUtils.isEmpty(sideSubtitleText) ->
-                canvas.drawText(sideSubtitleText!!, headerColumnWidth / 2, (headerTitleAndSubtitleTextHeight + sideSubtitleTextPaint.textSize) / 2.0f + weekDayHeaderRowPaddingTop, sideSubtitleTextPaint)
-        }
 
-        canvas.restore()
-        // Clip to paint header row only.
-        canvas.save()
-        canvas.clipRect(headerColumnWidth, 0f, width.toFloat(), headerHeight + weekDaysHeaderRowTotalPadding)
+            canvas.restore()
+            // Clip to paint header row only.
+            canvas.save()
+            canvas.clipRect(headerColumnWidth, 0f, width.toFloat(), headerHeight + weekDaysHeaderRowTotalPadding)
 
 
-        // Draw the header background.
-        if (enableDrawHeaderBackgroundOnlyOnWeekDays)
-            canvas.drawRect(0f, 0f, width.toFloat(), headerTitleAndSubtitleTextHeight + weekDaysHeaderRowTotalPadding, headerBackgroundPaint)
-        else
-            canvas.drawRect(0f, 0f, width.toFloat(), headerHeight + weekDaysHeaderRowTotalPadding, headerBackgroundPaint)
+            // Draw the header background.
+            if (enableDrawHeaderBackgroundOnlyOnWeekDays)
+                canvas.drawRect(0f, 0f, width.toFloat(), headerTitleAndSubtitleTextHeight + weekDaysHeaderRowTotalPadding, headerBackgroundPaint)
+            else
+                canvas.drawRect(0f, 0f, width.toFloat(), headerHeight + weekDaysHeaderRowTotalPadding, headerBackgroundPaint)
 
-        canvas.restore()
-        canvas.save()
+            canvas.restore()
+            canvas.save()
 
-        canvas.clipRect(headerColumnWidth, 0f, width.toFloat(), headerHeight + weekDaysHeaderRowTotalPadding - spaceBelowAllDayEvents)
+            canvas.clipRect(headerColumnWidth, 0f, width.toFloat(), headerHeight + weekDaysHeaderRowTotalPadding - spaceBelowAllDayEvents)
 
-        // Draw the header row texts.
-        run {
-            val day = mHomeDate!!.clone() as Calendar
-            startPixel = startFromPixel
-            day.add(Calendar.DATE, leftDaysWithGaps)
-            for (dayNumber in leftDaysWithGaps + 1..leftDaysWithGaps + realNumberOfVisibleDays + 1) {
-                // Check if the day is today.
-                val isToday = isSameDay(day, today)
-                // Don't draw days which are outside requested range
-                if (!isValidDay(day)) {
+            // Draw the header row texts.
+            run {
+                val day = mHomeDate!!.clone() as Calendar
+                startPixel = startFromPixel
+                day.add(Calendar.DATE, leftDaysWithGaps)
+                for (dayNumber in leftDaysWithGaps + 1..leftDaysWithGaps + realNumberOfVisibleDays + 1) {
+                    // Check if the day is today.
+                    val isToday = isSameDay(day, today)
+                    // Don't draw days which are outside requested range
+                    if (!isValidDay(day)) {
+                        day.add(Calendar.DAY_OF_YEAR, 1)
+                        continue
+                    }
+                    // Draw the day labels title
+                    val dayLabel = getFormattedWeekDayTitle(day)
+                    canvas.drawText(dayLabel, startPixel + widthPerDay / 2, headerWeekDayTitleTextHeight + weekDayHeaderRowPaddingTop, if (isToday) headerWeekDayTitleTodayTextPaint else headerWeekDayTitleTextPaint)
+
+                    //draw day subtitle
+                    if (isSubtitleHeaderEnabled) {
+                        val subtitleText = getFormattedWeekDaySubtitle(day)
+                        canvas.drawText(subtitleText, startPixel + widthPerDay / 2, headerTitleAndSubtitleTextHeight + weekDayHeaderRowPaddingTop,
+                            if (isToday) headerWeekDaySubtitleTodayTextPaint else headerWeekDaySubtitleTextPaint)
+                    }
+                    if (containsAllDayEvent && enableAllDayEvent)
+                        drawAllDayEvents(day, startPixel, canvas)
+                    startPixel += widthPerDay + columnGap
                     day.add(Calendar.DAY_OF_YEAR, 1)
-                    continue
                 }
-                // Draw the day labels title
-                val dayLabel = getFormattedWeekDayTitle(day)
-                canvas.drawText(dayLabel, startPixel + widthPerDay / 2, headerWeekDayTitleTextHeight + weekDayHeaderRowPaddingTop, if (isToday) headerWeekDayTitleTodayTextPaint else headerWeekDayTitleTextPaint)
-
-                //draw day subtitle
-                if (isSubtitleHeaderEnabled) {
-                    val subtitleText = getFormattedWeekDaySubtitle(day)
-                    canvas.drawText(subtitleText, startPixel + widthPerDay / 2, headerTitleAndSubtitleTextHeight + weekDayHeaderRowPaddingTop,
-                        if (isToday) headerWeekDaySubtitleTodayTextPaint else headerWeekDaySubtitleTextPaint)
-                }
-                if (containsAllDayEvent && enableAllDayEvent)
-                    drawAllDayEvents(day, startPixel, canvas)
-                startPixel += widthPerDay + columnGap
-                day.add(Calendar.DAY_OF_YEAR, 1)
             }
+            canvas.restore()
         }
-        canvas.restore()
         //draw text on the left of the all-day events
         if (containsAllDayEvent && enableAllDayEvent && !allDaySideTitleText.isNullOrEmpty()) {
             canvas.save()
-            val weekDaysHeight = headerTitleAndSubtitleTextHeight + weekDaysHeaderRowTotalPadding
+            val weekDaysHeight = 0 + weekDaysHeaderRowTotalPadding
             val top = weekDaysHeight + spaceBetweenWeekDaysAndAllDayEvents + timeTextHeight / 2
             val bottom = top + allDayEventHeight
             canvas.clipRect(0f, 0f, top, bottom)
@@ -1814,15 +1822,17 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         // Prepare the name of the event.
         val bob = SpannableStringBuilder()
         if (!TextUtils.isEmpty(event.name) || !TextUtils.isEmpty(untitledEventText)) {
-            if (!TextUtils.isEmpty(event.name))
+            if (!TextUtils.isEmpty(event.name)) {
                 bob.append(event.name)
-            else bob.append(untitledEventText)
+            } else bob.append(untitledEventText)
+            bob.setSpan(AbsoluteSizeSpan(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 16.0f, context.resources.displayMetrics).toInt()), 0, bob.length, 0)
             bob.setSpan(StyleSpan(Typeface.BOLD), 0, bob.length, 0)
         }
         // Prepare the location of the event.
         if (!TextUtils.isEmpty(event.location)) {
-            if (bob.isNotEmpty())
+            if (bob.isNotEmpty()) {
                 bob.append("\n")
+            }
             bob.append(event.location)
         }
 
@@ -1834,7 +1844,8 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             eventTextPaint.color = textColorPicker!!.getTextColor(event)
         }
         // Get text dimensions.
-        var textLayout = StaticLayout(bob, eventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, false)
+        var textLayout = StaticLayout(bob, eventTextPaint, availableWidth,
+            Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, false)
         if (textLayout.lineCount > 0) {
             val lineHeight = textLayout.height / textLayout.lineCount
 
@@ -1844,7 +1855,10 @@ class WeekView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 do {
                     // Ellipsize text to fit into event rect.
                     if (newEventIdentifier != event.id)
-                        textLayout = StaticLayout(TextUtils.ellipsize(bob, eventTextPaint, (availableLineCount * availableWidth).toFloat(), TextUtils.TruncateAt.END), eventTextPaint, (rect.right - originalLeft - (eventPadding * 2).toFloat()).toInt(), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, false)
+                        textLayout = StaticLayout(
+                            TextUtils.ellipsize(bob, eventTextPaint, (availableLineCount * availableWidth).toFloat(), TextUtils.TruncateAt.END),
+                            eventTextPaint, (rect.right - originalLeft - (eventPadding * 2f)).toInt(),
+                            Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, false)
 
                     // Reduce line count.
                     availableLineCount--
